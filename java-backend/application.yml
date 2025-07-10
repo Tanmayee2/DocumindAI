@@ -13,6 +13,10 @@ spring:
       uri: mongodb://localhost:27017/documind
       database: documind
 
+ai:
+  service:
+    url: http://localhost:8000
+
 logging:
   level:
     com.documind: DEBUG

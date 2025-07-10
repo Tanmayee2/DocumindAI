@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "documents")
-public class Doc {
+public class DocumentEntity {
     @Id
     private String id;
     private String fileName;
@@ -24,5 +24,5 @@ public class Doc {
     private LocalDateTime processedAt;
     private Integer chunkCount;
     private List<String> chunkIds;
-    private String userId; // For future multi-user support
+    private String userId;
 }

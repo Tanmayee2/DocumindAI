@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "chunks")
-public class Chunk {
+public class ChunkEntity {
     @Id
     private String id;
     private String documentId;
