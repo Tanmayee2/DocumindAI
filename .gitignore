@@ -33,3 +33,9 @@ data/
 # Logs
 *.log
 logs/
+
+# Maven
+java-backend/target/
+java-backend/.mvn/
+java-backend/mvnw
+java-backend/mvnw.cmd
