@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "documents")
-public class Document {
+public class Doc {
     @Id
     private String id;
     private String fileName;
