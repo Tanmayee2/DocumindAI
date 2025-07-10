@@ -3,8 +3,8 @@ package com.documind.service;
 import com.documind.client.AIServiceClient;
 import com.documind.dto.DocumentResponse;
 import com.documind.dto.DocumentUploadResponse;
-import com.documind.model.Chunk;
-import com.documind.model.DocumentEntity;  // ← Updated import
+import com.documind.model.ChunkEntity;
+import com.documind.model.DocumentEntity;
 import com.documind.repository.ChunkRepository;
 import com.documind.repository.DocumentRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,43 +30,43 @@ public class DocumentService {
     public DocumentUploadResponse uploadDocument(MultipartFile file) {
         try {
             // Create document record
-            DocumentEntity document = new DocumentEntity();  // ← Updated
-            document.setFileName(file.getOriginalFilename());
-            document.setFileType(file.getContentType());
-            document.setFileSize(file.getSize());
-            document.setStatus("PROCESSING");
-            document.setUploadedAt(LocalDateTime.now());
-            document.setUserId("default");
+            DocumentEntity documentEntity = new DocumentEntity();
+            documentEntity.setFileName(file.getOriginalFilename());
+            documentEntity.setFileType(file.getContentType());
+            documentEntity.setFileSize(file.getSize());
+            documentEntity.setStatus("PROCESSING");
+            documentEntity.setUploadedAt(LocalDateTime.now());
+            documentEntity.setUserId("default");
             
-            document = documentRepository.save(document);
+            documentEntity = documentRepository.save(documentEntity);
             
             // Extract text
-            log.info("Extracting text from document: {}", document.getId());
+            log.info("Extracting text from document: {}", documentEntity.getId());
             String extractedText = parserService.extractText(file);
             
             // Chunk the text
-            log.info("Chunking document: {}", document.getId());
-            List<Chunk> chunks = chunkingService.chunkText(document.getId(), extractedText);
+            log.info("Chunking document: {}", documentEntity.getId());
+            List<ChunkEntity> chunks = chunkingService.chunkText(documentEntity.getId(), extractedText);
             
             // Save chunks
             chunks = chunkRepository.saveAll(chunks);
             
             // Update document with chunk info
-            document.setChunkCount(chunks.size());
-            document.setChunkIds(chunks.stream().map(Chunk::getId).collect(Collectors.toList()));
-            document.setStatus("COMPLETED");
-            document.setProcessedAt(LocalDateTime.now());
-            documentRepository.save(document);
+            documentEntity.setChunkCount(chunks.size());
+            documentEntity.setChunkIds(chunks.stream().map(ChunkEntity::getId).collect(Collectors.toList()));
+            documentEntity.setStatus("COMPLETED");
+            documentEntity.setProcessedAt(LocalDateTime.now());
+            documentRepository.save(documentEntity);
             
-            // Index document in AI service
-            aiServiceClient.indexDocument(document.getId()).subscribe();
+            // Index document in AI service (async)
+            aiServiceClient.indexDocument(documentEntity.getId()).subscribe();
             
-            log.info("Document processed successfully: {}", document.getId());
+            log.info("Document processed successfully: {}", documentEntity.getId());
             
             return new DocumentUploadResponse(
-                document.getId(),
-                document.getFileName(),
-                document.getStatus(),
+                documentEntity.getId(),
+                documentEntity.getFileName(),
+                documentEntity.getStatus(),
                 "Document uploaded and processed successfully"
             );
             
@@ -93,16 +93,16 @@ public class DocumentService {
             .orElse(null);
     }
     
-    private DocumentResponse toDocumentResponse(DocumentEntity document) {  // ← Updated parameter
+    private DocumentResponse toDocumentResponse(DocumentEntity entity) {
         return new DocumentResponse(
-            document.getId(),
-            document.getFileName(),
-            document.getFileType(),
-            document.getFileSize(),
-            document.getStatus(),
-            document.getUploadedAt(),
-            document.getProcessedAt(),
-            document.getChunkCount()
+            entity.getId(),
+            entity.getFileName(),
+            entity.getFileType(),
+            entity.getFileSize(),
+            entity.getStatus(),
+            entity.getUploadedAt(),
+            entity.getProcessedAt(),
+            entity.getChunkCount()
         );
     }
 }

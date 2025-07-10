@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+// @Entity
 @Document(collection = "chunks")
 public class ChunkEntity {
     @Id

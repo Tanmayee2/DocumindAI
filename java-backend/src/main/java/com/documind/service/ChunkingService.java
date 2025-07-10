@@ -1,6 +1,6 @@
 package com.documind.service;
 
-import com.documind.model.Chunk;
+import com.documind.model.ChunkEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,9 +12,9 @@ public class ChunkingService {
     private static final int CHUNK_SIZE = 500; // words
     private static final int OVERLAP_SIZE = 50; // words
     
-    public List<Chunk> chunkText(String documentId, String text) {
+    public List<ChunkEntity> chunkText(String documentId, String text) {
         String[] words = text.split("\\s+");
-        List<Chunk> chunks = new ArrayList<>();
+        List<ChunkEntity> chunks = new ArrayList<>();
         
         int index = 0;
         int position = 0;
@@ -27,7 +27,7 @@ public class ChunkingService {
                 chunkContent.append(words[i]).append(" ");
             }
             
-            Chunk chunk = new Chunk();
+            ChunkEntity chunk = new ChunkEntity();
             chunk.setDocumentId(documentId);
             chunk.setContent(chunkContent.toString().trim());
             chunk.setChunkIndex(index);
@@ -37,7 +37,9 @@ public class ChunkingService {
             chunks.add(chunk);
             
             position = endPosition - OVERLAP_SIZE;
-            if (position < 0) position = endPosition;
+            if (position < 0 || position >= words.length) {
+                position = endPosition;
+            }
             index++;
         }
         
