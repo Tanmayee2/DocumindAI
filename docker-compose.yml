@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: documind-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - documind-network
+
+  java-backend:
+    build:
+      context: ./java-backend
+      dockerfile: Dockerfile
+    container_name: documind-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/documind
+      - AI_SERVICE_URL=http://python-service:8000
+    depends_on:
+      - mongodb
+    networks:
+      - documind-network
+
+  python-service:
+    build:
+      context: ./python-service
+      dockerfile: Dockerfile
+    container_name: documind-ai
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - CHROMA_DB_PATH=/app/chroma_db
+    volumes:
+      - chroma_data:/app/chroma_db
+    depends_on:
+      - mongodb
+    networks:
+      - documind-network
+
+volumes:
+  mongodb_data:
+  chroma_data:
+
+networks:
+  documind-network:
+    driver: bridge
