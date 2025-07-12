@@ -39,3 +39,11 @@ java-backend/target/
 java-backend/.mvn/
 java-backend/mvnw
 java-backend/mvnw.cmd
+
+#Python
+python-service/venv/
+python-service/__pycache__/
+python-service/**/__pycache__/
+python-service/*.pyc
+python-service/.env
+python-service/chroma_db/
